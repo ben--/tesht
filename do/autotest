@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+set -o pipefail
+
+git ls-files -co --exclude-standard | entr -d do/test

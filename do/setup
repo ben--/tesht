@@ -1,0 +1,30 @@
+#!/bin/bash -- for import only
+
+this_script="$(cd "$(dirname "${BASH_SOURCE[1]}")" && pwd)/$(basename "${BASH_SOURCE[1]}")"
+
+run_in_docker()
+{
+    DOCKER_IMAGE="${@: -1}"
+
+    if ! in_docker_container; then
+        run_this_script_in_docker "${@:1:$(($#-1))}"
+        exit $?
+    fi
+}
+
+in_docker_container()
+{
+    [[ "${DOCKER_CONTAINER:-}" = "${DOCKER_IMAGE}" ]]
+    return $?
+}
+
+run_this_script_in_docker()
+{
+    docker build --rm -t "$DOCKER_IMAGE" "do/$DOCKER_IMAGE"
+    docker run --rm \
+        --env=DOCKER_CONTAINER="$DOCKER_IMAGE" \
+        --volume="$(pwd):$(pwd)" \
+        --workdir="$(pwd)" \
+        "$DOCKER_IMAGE" \
+        "$this_script"
+}

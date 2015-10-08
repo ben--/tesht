@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+set -o pipefail
+
+. do/setup
+run_in_docker test-docker
+
+echo "Running script in $DOCKER_CONTAINER ($DOCKER_IMAGE)"
+env
